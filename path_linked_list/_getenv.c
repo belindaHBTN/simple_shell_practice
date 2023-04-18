@@ -1,6 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include "main.h"
 
 char *_getenv(const char *name)
 {

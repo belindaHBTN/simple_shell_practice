@@ -1,9 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include "main.h"
-
-
 
 list_t *get_directory_list(void)
 {
