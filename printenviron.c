@@ -2,10 +2,11 @@
 #include <unistd.h>
 
 extern char **environ;
-int i = 0;
 
 int main()
 {
+	int i = 0;
+
 	while (environ[i] != NULL)
 	{
 		printf("%s\n", environ[i]);
