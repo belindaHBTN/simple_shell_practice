@@ -4,11 +4,11 @@
 
 int get_size(void)
 {
-	extern char *environ[];
+	extern char **environ;
 	int size_env;
 
 	size_env = 0;
-	while (environ[size_env] != NULl)
+	while (environ[size_env] != NULL)
 	{
 		size_env = size_env + 1;
 	}
@@ -18,7 +18,7 @@ int get_size(void)
 
 int get_index(char *name, int *index)
 {
-	extern char *environ[];
+	extern char **environ;
 	int i;
 	int len_name;
 
@@ -37,45 +37,16 @@ int get_index(char *name, int *index)
 	return (-1);
 }
 
-void initial_env(void)
-{
-	int size_env;
-	char *new_environ[];
-	int i;
-	extern char *environ[];
-
-	size_env = get_size();
-	new_environ = malloc(sizeof(*new_environ) * (size_env + 1));
-	if (new_environ	 == NULL)
-	{
-		return (-1);
-	}
-
-	i = 0;
-	while (i < size_env)
-	{
-		new_environ[i] = strdup(environ[i]);
-		if (new_environ[i] == NULL)
-		{
-			// Todo: need to free
-			return (-1);
-		}
-		i = i + 1;
-	}
-
-	environ = new_environ;
-}
-
 char *find_value(char *name)
 {
 	int i;
-	extern char *environ[];
+	extern char **environ;
 	int len_name;
 
 	len_name = strlen(name);
 
 	i = 0;
-	while (environp[i] != NULL)
+	while (environ[i] != NULL)
 	{
 		if (name != NULL)
 		{
@@ -92,9 +63,10 @@ char *find_value(char *name)
 
 int delete_env(char *name)
 {
-	extern char *environ[];
+	extern char **environ;
 	int index;
-	char *new_environ[];
+	char **new_environ;
+	int i;
 
 	if (get_index(name, &index) == -1)
 	{
@@ -112,7 +84,7 @@ int delete_env(char *name)
 		}
 		else if (i > index)
 		{
-			new_environ[i-1] = envrion[i];
+			new_environ[i-1] = environ[i];
 		}
 		i = i + 1;
 	}
@@ -125,25 +97,58 @@ int delete_env(char *name)
 	return (0);
 }
 
+int add_env(char *name, char *value, int overwrite)
+{
+	extern char **environ;
+	char **new_environ;
+	int i;
+	int len_name;
+	int len_value;
 
+	len_name = strlen(name);
+	len_value = strlen(value);
+
+	new_environ = malloc(sizeof(*new_environ) * (get_size() + 2));
+	if (new_environ == NULL)
+	{
+		return (-1);
+	}
+
+	i = 0;
+	while (environ[i] != NULL)
+	{
+		new_environ[i] = environ[i];
+		i = i + 1;
+	}
+	new_environ[i] = malloc(sizeof(*new_environ[i] * (len_name + len_value + 2)));
+	new_environ[i][0] = '\0';
+	new_environ[i] = strcat(new_environ[i], name);
+	new_environ[i] = strcat(new_environ[i], "=");
+	new_environ[i] = strcat(new_environ[i], value);
+	new_environ[i + 1] = NULL;
+
+	free(environ);
+	environ = new_environ;
+	return (0);
+}
 
 int set_env(char *name, char *value, int overwrite)
 {
-	char *value;
-	extern char *environ[];
-	char *new_environ[];
-	ini i;
+	char *result;
+	extern char **environ;
+	char **new_environ;
+	int i;
 
 
-	value = find_value(name);
-	if (value == NULL)
+	result = find_value(name);
+	if (result == NULL)
 	{
 		add_env(name, value, overwrite);
 		return (0);
 	}
 	else
 	{
-		if (overwirte == 0)
+		if (overwrite == 0)
 		{
 			return (0);
 		}
@@ -156,33 +161,24 @@ int set_env(char *name, char *value, int overwrite)
 	}
 }
 
-int add_env(char *name, char *value, int overwrite)
+
+
+void print_env()
 {
 	extern char **environ;
-	char *new_environ[];
 	int i;
-	int len_name;
-	int len_value;
 
-	len_str = strlen(
-
-	new_environ = malloc(sizeof(*new_env) * (get_size() + 2);
-	if (new_environ == NULL)
-	{
-		return (-1);
-	}
+	i = 0;
 	while (environ[i] != NULL)
 	{
-		new_environ[i] = environ[i];
+		printf ("%s\n", environ[i]);
 		i = i + 1;
 	}
-	new_environ[i] = malloc(sizeof(*new_environ[i] * (len_name + len_value + 2)));
-	new_environ[i] 
 }
-
-
 
 int main(void)
 {
-	initial_env();
+	print_env();
+
+	return (0);
 }
