@@ -16,7 +16,7 @@ int get_size(void)
 	return (size_env);
 }
 
-int get_index(char *name, int *index)
+int get_index(char *name, unsigned int *index)
 {
 	extern char **environ;
 	int i;
@@ -35,6 +35,49 @@ int get_index(char *name, int *index)
 	}
 
 	return (-1);
+}
+
+void free_env()
+{
+	extern char **environ;
+	unsigned i;
+
+	i = 0;
+	while (environ[i] != NULL)
+	{
+		free(environ[i]);
+		i = i + 1;
+	}
+}
+
+int  initial_env(void)
+{
+	int size_env;
+	char **new_environ;
+	unsigned int i;
+	extern char **environ;
+
+	size_env = get_size();
+	new_environ = malloc(sizeof(*new_environ) * (size_env + 1));
+	if (new_environ	 == NULL)
+	{
+		return (-1);
+	}
+
+	i = 0;
+	while (i < size_env)
+	{
+		new_environ[i] = strdup(environ[i]);
+		if (new_environ[i] == NULL)
+		{
+			// Todo: need to free
+			return (-1);
+		}
+		i = i + 1;
+	}
+
+	environ = new_environ;
+	return (0);
 }
 
 char *find_value(char *name)
@@ -127,7 +170,7 @@ int add_env(char *name, char *value, int overwrite)
 	new_environ[i] = strcat(new_environ[i], value);
 	new_environ[i + 1] = NULL;
 
-	free(environ);
+	free_env();
 	environ = new_environ;
 	return (0);
 }
@@ -138,7 +181,6 @@ int set_env(char *name, char *value, int overwrite)
 	extern char **environ;
 	char **new_environ;
 	int i;
-
 
 	result = find_value(name);
 	if (result == NULL)
@@ -176,9 +218,20 @@ void print_env()
 	}
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-	print_env();
+//	initial_env();
+//	print_env();
+//	set_env(argv[1], argv[2], atoi(argv[3]));
 
+//	char *result;
+//	result = find_value("HOME");
+//	if (result == NULL)
+//		printf("nothing found\n");
+//	else
+//		printf("%s\n",result);
+
+	add_env(argv[1], argv[2], atoi(argv[3]));
+	print_env();
 	return (0);
 }
