@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-int exec(char *cmd)
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int _exec(char *cmd)
 {
         char *argv[] = {cmd, NULL};
 
-        printf("the buffer in the exec: %s\n", cmd);
         if (execve(argv[0], argv, NULL) == -1)
         {
                 perror("Error:");
@@ -17,22 +19,42 @@ int exec(char *cmd)
 int main()
 {
         char *buffer;
-        size_t bufsize = 32;
-        size_t characters;
+        size_t bufsize;
+        size_t result;
+	pid_t pid;
+	int status;
 
-        buffer = (char *)malloc(bufsize * sizeof(*buffer));
-        if (buffer == NULL)
-        {
-                perror("Unable to allocate buffer");
-                exit(1);
-        }
+	buffer = NULL;
+	bufsize = 0;
 
-        printf("#c_is_fun$ ");
-        characters = getline(&buffer,&bufsize,stdin);
-        buffer = strtok(buffer, "\n");
-        printf("the buffer in the main: %s\n", buffer);
-        exec(buffer);
+	while (1)
+	{
+		printf("#c_is_fun$ ");
 
-        free(buffer);
+		result = getline(&buffer,&bufsize,stdin);
+		if (result == -1)
+		{
+			printf("fail to get the input");
+			free(buffer);
+			return(1);
+		}
+		buffer = strtok(buffer, "\n");
+
+		pid = fork();
+		if (pid == -1)
+		{
+			perror("Error:");
+			return (1);
+		}
+		if (pid == 0)
+		{
+			_exec(buffer);
+		}
+		else
+		{
+			wait(&status);
+		}
+	}
+	free(buffer);
         return(0);
 }
