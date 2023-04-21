@@ -2,14 +2,14 @@
 
 int get_size(void)
 {
-	extern char *environ[];
-	unsigned int env_size;
+	extern char **environ;
+	int size_env;
 
-	env_size = 0;
-	while (environ[env_size] != NULL)
+	size_env = 0;
+	while (environ[size_env] != NULL)
 	{
-		env_size = env_size + 1;
+		size_env = size_env + 1;
 	}
 
-	return (env_size);
+	return (size_env);
 }

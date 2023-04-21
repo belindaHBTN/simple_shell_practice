@@ -1,9 +1,13 @@
 #include "main.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
-	int i;
-	i = get_size();
-	printf("%d", i);
+	int overwrite;
+
+	overwrite = atoi(argv[3]);
+	set_env(argv[1], argv[2], overwrite);
+	print_env();
+	printf("up add 1 new pair================================\n");
+
 	return (0);
 }
